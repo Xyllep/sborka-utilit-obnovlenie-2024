@@ -49,8 +49,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-        env:
-          npm_config_cache: /mnt/npmcache
 
       - name: Build Next.js app & CLI bundle
         run: |
