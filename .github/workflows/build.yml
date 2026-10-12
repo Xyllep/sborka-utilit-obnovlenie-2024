@@ -20,15 +20,21 @@ jobs:
     name: Fast Production Build
     runs-on: ubuntu-latest
     steps:
-      - name: Expand Virtual Memory (Native 10GB Swap)
+      - name: Expand Virtual Memory (6GB Swap) + free disk
         run: |
           sudo swapoff -a || true
           sudo rm -f /mnt/swapfile /swapfile
-          sudo fallocate -l 10G /mnt/swapfile || sudo dd if=/dev/zero of=/mnt/swapfile bs=1M count=10240
+          sudo fallocate -l 6G /mnt/swapfile || sudo dd if=/dev/zero of=/mnt/swapfile bs=1M count=6144
           sudo chmod 600 /mnt/swapfile
           sudo mkswap /mnt/swapfile
           sudo swapon /mnt/swapfile
           free -h
+          # Free disk space (runner ~21GB free; node_modules + build need headroom)
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup \
+                      /opt/hostedtoolcache/CodeQL /usr/local/share/boost \
+                      /usr/lib/jvm /opt/google/chrome /opt/microsoft 2>/dev/null || true
+          sudo docker image prune -af 2>/dev/null || true
+          df -h /
 
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -43,6 +49,8 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        env:
+          npm_config_cache: /mnt/npmcache
 
       - name: Build Next.js app & CLI bundle
         run: |
