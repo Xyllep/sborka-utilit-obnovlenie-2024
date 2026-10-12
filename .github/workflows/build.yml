@@ -18,13 +18,13 @@ permissions:
 jobs:
   build:
     name: Fast Production Build
-    runs-on: ubuntu-latest-4-cores
+    runs-on: ubuntu-latest
     steps:
       - name: Expand Virtual Memory (6GB Swap) + free disk
         run: |
           sudo swapoff -a || true
           sudo rm -f /mnt/swapfile /swapfile
-          sudo fallocate -l 6G /mnt/swapfile || sudo dd if=/dev/zero of=/mnt/swapfile bs=1M count=6144
+          sudo fallocate -l 8G /mnt/swapfile || sudo dd if=/dev/zero of=/mnt/swapfile bs=1M count=8192
           sudo chmod 600 /mnt/swapfile
           sudo mkswap /mnt/swapfile
           sudo swapon /mnt/swapfile
@@ -54,8 +54,8 @@ jobs:
         run: |
           npm run build:release
         env:
-          NODE_OPTIONS: "--max-old-space-size=12288"
-          OMNIROUTE_BUILD_MEMORY_MB: "12288"
+          NODE_OPTIONS: "--max-old-space-size=8192"
+          OMNIROUTE_BUILD_MEMORY_MB: "8192"
           OMNIROUTE_USE_TURBOPACK: "1"
 
       - name: Archive build outputs
