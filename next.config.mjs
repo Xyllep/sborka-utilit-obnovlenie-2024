@@ -235,6 +235,10 @@ const nextConfig = {
   // accept for image-bearing requests; tune via env if a deployment needs
   // more.
   experimental: {
+    // CI (7GB hosted runner): static generation of 623 pages with 3 workers
+    // spikes RAM and gets the runner killed ("shutdown signal"). Serialize it.
+    workerThreads: false,
+    cpus: process.env.OMNIROUTE_BUILD_SINGLE_WORKER ? 1 : undefined,
     serverActions: {
       bodySizeLimit: process.env.OMNIROUTE_SERVER_ACTIONS_BODY_LIMIT || "50mb",
     },

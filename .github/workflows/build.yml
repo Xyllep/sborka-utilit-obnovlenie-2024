@@ -55,6 +55,7 @@ jobs:
           npm run build:release
         env:
           NODE_OPTIONS: "--max-old-space-size=8192"
+          OMNIROUTE_BUILD_SINGLE_WORKER: "1"
           OMNIROUTE_BUILD_MEMORY_MB: "8192"
           OMNIROUTE_USE_TURBOPACK: "1"
 
