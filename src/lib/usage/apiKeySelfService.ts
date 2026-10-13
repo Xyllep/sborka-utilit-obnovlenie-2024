@@ -1,4 +1,5 @@
 import { hasSelfAccountQuotaScope, hasSelfUsageScope } from "@/shared/constants/selfServiceScopes";
+import { getBalanceStatus, type BalanceMetadata } from "@/lib/db/apiKeyBalanceStatus";
 import { supportsProviderQuota } from "@/shared/utils/providerQuotaVisibility";
 
 type JsonRecord = Record<string, unknown>;
@@ -9,6 +10,10 @@ interface ApiKeySelfServiceMetadata {
   name: string;
   scopes: string[];
   allowedConnections: string[];
+  balanceEnabled?: boolean;
+  balanceValue?: number | null;
+  balanceCurrency?: string | null;
+  balanceWindowStart?: string | null;
 }
 
 interface StatementLike {
@@ -406,12 +411,14 @@ export async function buildApiKeySelfServiceStatus(
   );
   const accountQuotas = await resolveAccountQuotas(metadata, resolvedDeps);
   const accountQuota = accountQuotas && accountQuotas.length === 1 ? accountQuotas[0] : undefined;
+  const balance = await getBalanceStatus(metadata as BalanceMetadata);
 
   return {
     apiKey: {
       id: metadata.id,
       name: metadata.name,
     },
+    ...(balance && { balance }),
     usage: {
       cost,
       tokens: {
