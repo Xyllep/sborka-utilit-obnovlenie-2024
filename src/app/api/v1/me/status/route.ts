@@ -30,10 +30,7 @@ export async function GET(request: Request) {
 
   try {
     const status = await buildApiKeySelfServiceStatus({
-      id: metadata.id,
-      name: metadata.name,
-      scopes: metadata.scopes,
-      allowedConnections: metadata.allowedConnections,
+      ...metadata,
     });
 
     return NextResponse.json(status);
